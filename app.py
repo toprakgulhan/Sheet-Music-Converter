@@ -1,14 +1,13 @@
 from flask import Flask, request, jsonify, abort, Response
 from flask_sqlalchemy import SQLAlchemy
 import tempfile, os, subprocess, traceback, re, base64
-
 from basic_pitch.inference import predict
 from music21 import converter, stream
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']        = 'postgresql://postgres:123456789@localhost:5432/SheetMusic'
+app.config['SQLALCHEMY_DATABASE_URI']        = 'postgresql:ENTER YOUR POSTGRESQL URL'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['MAX_CONTENT_LENGTH']             = 100 * 1024 * 1024  # 100 MB
+app.config['MAX_CONTENT_LENGTH']             = 100 * 1024 * 1024 
 
 db = SQLAlchemy(app)
 
@@ -17,7 +16,7 @@ class Transcription(db.Model):
     id             = db.Column(db.Integer, primary_key=True)
     filename       = db.Column(db.Text)
     mimetype       = db.Column(db.Text)
-    pages          = db.Column(db.JSON)       # stored as base64 strings
+    pages          = db.Column(db.JSON)      
     created_at     = db.Column(db.DateTime, server_default=db.func.now())
 
 def transcribe_audio(path):
@@ -29,7 +28,6 @@ def transcribe_audio(path):
     return midi_data
 
 def normalize_score(score):
-    # your duration‐rounding or cleanup logic could go here
     return score
 
 def convert_to_score(midi):
@@ -61,12 +59,10 @@ def generate_png_pages(score):
     score.write("musicxml", fp=xmlf.name)
     xmlf.close()
 
-    # strip out any <time-modification> tags
     xml = open(xmlf.name, encoding="utf-8").read()
     clean = re.sub(r"<time-modification>.*?</time-modification>", "", xml, flags=re.DOTALL)
     open(xmlf.name, "w", encoding="utf-8").write(clean)
 
-    # call MuseScore CLI in that temp dir
     ms_exe = os.getenv("MUSESCORE_PATH", r"C:\Program Files\MuseScore 3\bin\MuseScore3.exe")
     tmpdir   = os.path.dirname(xmlf.name)
     basename = os.path.splitext(os.path.basename(xmlf.name))[0]
@@ -98,7 +94,6 @@ def generate_png_pages(score):
         os.remove(fn)
         idx += 1
 
-    # fallback single‐page if no numbered pages found
     single = os.path.join(tmpdir, f"{basename}.png")
     if not pages and os.path.exists(single):
         print("[generate_png_pages] loading single‐page", flush=True)
@@ -138,7 +133,6 @@ def transcribe():
     if not pages_bin:
         abort(500, "No pages generated")
 
-    # store base64 in DB
     pages_b64 = [base64.b64encode(p).decode("ascii") for p in pages_bin]
     rec = Transcription(
         filename = f.filename,
@@ -149,7 +143,6 @@ def transcribe():
     db.session.commit()
     print(f"[/transcribe] saved record ID={rec.id}", flush=True)
 
-    # only return id + page_count
     resp = jsonify({
         "id":         rec.id,
         "page_count": len(pages_b64)
