@@ -4,7 +4,6 @@ import '../main.dart' show themeNotifier;
 class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // read current mode
     final isDark = themeNotifier.value == ThemeMode.dark;
 
     return Scaffold(
@@ -20,7 +19,6 @@ class SettingsPage extends StatelessWidget {
               themeNotifier.value = v ? ThemeMode.dark : ThemeMode.light;
             },
           ),
-          // you can add more settings here…
         ],
       ),
     );
