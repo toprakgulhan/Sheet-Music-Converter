@@ -1,5 +1,3 @@
-// lib/pages/record_page.dart
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -89,7 +87,6 @@ class _RecordPageState extends State<RecordPage> {
                   ),
                   const SizedBox(height: 12),
 
-                  // The big note‐icon button
                   GestureDetector(
                     onTap: _pickAndConvert,
                     child: Container(
@@ -117,7 +114,6 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                   ),
 
-                  // If a file has been picked, show its name below
                   if (_filePath != null) ...[
                     const SizedBox(height: 12),
                     Text(
