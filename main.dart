@@ -3,8 +3,6 @@ import 'pages/record_page.dart';
 import 'pages/library_page.dart';
 import 'pages/settings_page.dart';
 
-// a single global notifier:
-// you can move this into its own file if you prefer
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() => runApp(SheetMusicApp());
@@ -18,7 +16,7 @@ class SheetMusicApp extends StatelessWidget {
         return MaterialApp(
           title: 'Recorder & Transcriber',
           themeMode: currentMode,
-          // light theme:
+          
           theme: ThemeData(
             brightness: Brightness.light,
             primarySwatch: Colors.blue,
@@ -30,7 +28,7 @@ class SheetMusicApp extends StatelessWidget {
               bodyMedium: TextStyle(fontWeight: FontWeight.w400),
             ),
           ),
-          // dark theme:
+
           darkTheme: ThemeData(
             brightness: Brightness.dark,
             primarySwatch: Colors.blue,
